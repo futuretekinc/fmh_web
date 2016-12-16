@@ -5,8 +5,10 @@
 #include <stdbool.h>
 #include "qdecoder.h"
 
-#define TEMP_SSLVPN_CONF        "/tmp/_sslvpn"
-#define SSLVPN_CONF             "/etc/config/sslvpn"
+#define TEMP_SSLVPN_CONF        "/tmp/_client.ovpn"
+#define SSLVPN_CONF             "/mnt/ramdisk/do/sslvpn_client/conf/client.ovpn"
+#define TEMP_SSLVPN_USR        "/tmp/_usr_crt"
+#define SSLVPN_USR             "/mnt/ramdisk/do/sslvpn_client/conf/usr_crt"
 
 int FTMC_SSLVPN(qentry_t *pReq)
 {
@@ -24,7 +26,7 @@ int FTMC_SSLVPN(qentry_t *pReq)
 
 		memset(szBuf, 0, sizeof(szBuf));
 
-		FILE *pPF = popen("/www/cgi-bin/scripts/sslvpn.sh", "r");
+		FILE *pPF = popen("/mnt/ramdisk/img/etc/www/cgi-bin/scripts/sslvpn.sh", "r");
 		if (pPF == NULL)
 		{
 				nRet = -1;
@@ -68,17 +70,56 @@ int FTMC_SSLVPN(qentry_t *pReq)
 					goto error;
 			}
 
-			fprintf(pFP, "config sslvpn\n");
-			fprintf(pFP, "\toption\tid\t%s\n", pID);
-			fprintf(pFP, "\toption\tpasswd\t%s\n", pPassword);
-			fprintf(pFP, "\toption\tremote\t%s\n", pRemote);
-			fprintf(pFP, "\toption\tport\t%s\n", pPort);
-			fprintf(pFP, "\toption\tauth-retry\t%s\n", pAuth);
-			fprintf(pFP, "\toption\tconnect-retry\t%s\n", pRetry);
-			fprintf(pFP, "\toption\tconnect-retry-max\t%s\n", pRetryMax);
+			fprintf(pFP, "client\n");
+			fprintf(pFP, "dev tun\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "auth-user-pass conf/usr_crt\n");
+			fprintf(pFP, ";auth none\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, ";proto tcp\n");
+			fprintf(pFP, "remote %s %s\n", pRemote, pPort);
+			fprintf(pFP, "\n");
+			fprintf(pFP, "script-security 3 system\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, ";tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384\n");
+			fprintf(pFP, ";tls-version-min 1.2\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "no-iv\n");
+			fprintf(pFP, "no-replay\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "persist-key\n");
+			fprintf(pFP, "persist-tun\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "ca cert/ca.crt\n");
+			fprintf(pFP, "cert cert/client.crt\n");
+			fprintf(pFP, "key cert/client.key\n");
+			fprintf(pFP, "comp-lzo\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "verb 3\n");
+			fprintf(pFP, "reneg-sec 0\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "cipher AES-128-CBC\n");
+			fprintf(pFP, ";auth-nocache\n");
+			fprintf(pFP, "auth-retry %s\n", pAuth);
+			fprintf(pFP, "\n");
+			fprintf(pFP, "log-append log/xenics\n");
+			fprintf(pFP, "\n");
+			fprintf(pFP, "connect-retry %s\n", pRetry);
+			fprintf(pFP, "connect-retry-max %s\n", pRetryMax);
 			fclose(pFP);
 
-			sprintf(pCmdBuff, "/bin/cp -f %s %s;sync;sync;/etc/init.d/sslvpn restart", TEMP_SSLVPN_CONF, SSLVPN_CONF);
+			pFP = fopen(TEMP_SSLVPN_USR, "w");
+			if (pFP == NULL)
+			{
+					nRet = -1;
+					goto error;
+			}
+
+			fprintf(pFP, "%s\n", pID);
+			fprintf(pFP, "%s", pPassword);
+			fclose(pFP);
+
+			sprintf(pCmdBuff, "/bin/cp -f %s %s;/bin/cp -f %s %s;sync;sync;/mnt/ramdisk/do/ssslvpn_client/xenics restart", TEMP_SSLVPN_CONF, SSLVPN_CONF, TEMP_SSLVPN_USR, SSLVPN_USR);
 			pFP = popen(pCmdBuff, "r");
 
 			printf("{");

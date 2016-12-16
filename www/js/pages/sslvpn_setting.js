@@ -41,11 +41,11 @@ function initVPN() {
 
 			    remote_tf.value = json.config.remote;
 	    		port_tf.value = json.config.port;
-	    		auth_retry_tf.value = json.config.auth;
-	    		connect_retry_tf.value = json.config.retry;
-	    		connect_retry_max_tf.value = json.config.max;
+	    		auth_retry_tf.value = json.config.auth_retry;
+	    		connect_retry_tf.value = json.config.connect_retry;
+	    		connect_retry_max_tf.value = json.config.connect_retry_max;
 	    		id_tf.value = json.config.id;
-	    		password_tf.value = json.config.pw;
+	    		password_tf.value = json.config.password;
             }
         },
         error : function(xhr, status, error) {

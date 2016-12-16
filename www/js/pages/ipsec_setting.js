@@ -139,7 +139,7 @@ function set()
         success : function(json) {
             console.log(json);
             if (json.result == "success") {
-            	alert("변경 되었습니다.");
+            	alert("설정이 변경 되었습니다.\n장비의 전원을 내렸다 올려 주세요.");
             }
         },
         error : function(xhr, status, error) {
