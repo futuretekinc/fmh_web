@@ -1,0 +1,115 @@
+#include <stdio.h> /* Standard input/output definitions */
+#include <string.h> /* String function definitions */
+#include <unistd.h> /* UNIX standard function definitions */
+#include <fcntl.h> /* File control definitions */
+#include <errno.h> /* Error number definitions */
+#include <termios.h> /* POSIX terminal control definitions */
+#include "qdecoder.h"
+
+
+int FTMC_SSLVPN(qentry_t *pReq)
+{
+	// Parse queries.
+	qentry_t *req = qcgireq_parse(NULL, 0);
+
+	// Get values
+	char *value = (char *)req->getstr(req, "cmd", false);
+	FILE *fp;
+	char resBuf[256];
+
+	if (strcmp(value, "state") == 0)
+	{
+		qcgires_setcontenttype(req, "text/xml");
+		printf("<SSLVPN>\n");
+		fp = popen("cat /etc/config/sslvpn | awk -f /www/cgi-bin/get_sslvpn_info.awk", "r");
+		while(fgets(resBuf, sizeof(resBuf), fp) != 0)
+		{
+			char szID[64];
+			char szPW[64];
+			char szRemote[64];
+			char szRemotePort[64];
+			char szAuthRetry[64];
+			char szConnectRetry[64];
+			char szConnectRetryMax[64];
+
+			if (7 == sscanf(resBuf, "%s %s %s %s %s %s %s", szID, szPW, szRemote, szRemotePort, szAuthRetry, szConnectRetry, szConnectRetryMax))
+			{
+				printf("<ID>%s</ID>\n", szID);
+				printf("<PW>%s</PW>\n", szPW);
+				printf("<REMOTE>%s</REMOTE>\n", szRemote);
+				printf("<REMOTE_PORT>%s</REMOTE_PORT>\n", szRemotePort);
+				printf("<AUTH_RETRY>%s</AUTH_RETRY>\n", szAuthRetry);
+				printf("<CONNECT_RETRY>%s</CONNECT_RETRY>\n", szConnectRetry);
+				printf("<CONNECT_RETRY_MAX>%s</CONNECT_RETRY_MAX>\n", szConnectRetryMax);
+			}
+		}
+		printf("</SSLVPN>");
+		pclose(fp);
+
+		return 0;
+
+	} else if (strcmp(value, "set") == 0) {
+		char *lpszRemote			= pReq->getstr(pReq, "remote", false);
+		char *lpszRemotePort		= pReq->getstr(pReq, "remote_port", false);
+		char *lpszAuthRetry    		= pReq->getstr(pReq, "auth_retry", false);
+		char *lpszConnectRetry		= pReq->getstr(pReq, "connect_retry", false);
+		char *lpszConnectRetryMax	= pReq->getstr(pReq, "connect_retry_max", false);
+		char *lpszID				= pReq->getstr(pReq, "id", false);
+		char *lpszPW				= pReq->getstr(pReq, "pw", false);
+
+		if ((lpszRemote == NULL) || 
+			(lpszRemotePort == NULL) ||
+			(lpszAuthRetry == NULL) ||
+			(lpszConnectRetry == NULL) ||
+			(lpszConnectRetryMax == NULL) ||
+			(lpszID == NULL) ||
+			(lpszPW == NULL))
+		{
+			qcgires_setcontenttype(pReq, "text/xml");
+			printf("<?xml version='1.0' encoding='ISO-8859-1'?>\n");
+			printf("<SSLVPN_CONFIG>\n");
+			printf("<RET>ERROR</RET>\n");
+			printf("<MSG>Invalid Parameter!</MSG>\n");
+			printf("</SSLVPN_CONFIG>\n");
+		}
+
+		// sslvpn ¼³Á¤
+		FILE *fp = fopen("/tmp/sslvpn", "w");
+		if (fp == NULL)
+		{
+			qcgires_setcontenttype(pReq, "text/xml");
+			printf("<?xml version='1.0' encoding='ISO-8859-1'?>\n");
+			printf("<SSLVPN_CONFIG>\n");
+			printf("<RET>SYSTEM_ERROR</RET>\n");
+			printf("<MSG>Can't create file\n[/tmp/udhcpd.conf]</MSG>\n");
+			printf("</SSLVPN_CONFIG>\n");
+			return  -1;
+		}
+		
+		fprintf(fp, "config sslvpn\n");
+		fprintf(fp, "	id %s\n", lpszID);
+		fprintf(fp, "	passwd %s\n", lpszPW);
+		fprintf(fp, "	remote %s\n", lpszRemote);
+		fprintf(fp, "	port %s\n", lpszRemotePort);
+		fprintf(fp, "	auth-retry %s\n", lpszAuthRetry);
+		fprintf(fp, "	connect-retry %s\n", lpszConnectRetry);
+		fprintf(fp, "	connect-retry-max %s\n", lpszConnectRetryMax);
+		fclose(fp);
+
+		fp = popen("cp -f /tmp/sslvpn /etc/config/sslvpn", "r");
+		pclose(fp);
+
+		// sslvpn restart
+		fp = popen("/ferret/sslvpn_client/xenics restart", "r");
+		sleep(2);
+		pclose(fp);
+			
+		qcgires_setcontenttype(pReq, "text/xml");
+		printf("<?xml version='1.0' encoding='ISO-8859-1'?>\n");
+		printf("<SSLVPN_CONFIG>\n");
+		printf("<RET>OK</RET>\n");
+		printf("</SSLVPN_CONFIG>\n");
+	}
+
+	return 0;
+}

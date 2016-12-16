@@ -1,0 +1,27 @@
+{
+    "config":{
+            "right":"183.99.73.67",
+            "left":"%any",
+            "keyexchange":"ikev1",
+            "ike":"aes128-sha1-modp1024!",
+            "ikelifetime":"8h",
+            "margintime":"5s",
+            "auto":"start",
+            "keyingtries":"%forever",
+            "aggressive":"no",
+            "authby":"psk",
+            "rightid":"%any",
+            "forceencaps":"yes",
+            "type":"tunnel",
+            "lifetime":"8h",
+            "replay_window":"0",
+            "esp":"aes128-sha1!",
+            "leftsubnet":"192.168.100.0/24",
+            "rightsubnet":"172.168.200.0/24",
+            "dpdaction":"restart",
+            "dpddelay":"3",
+            "dpdtimeout":"12",
+            "closeaction":"restart"
+    },
+        "result":"success"
+}
