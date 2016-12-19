@@ -29,7 +29,7 @@ function initVPN() {
             if (json.enable == "false")
             {
                 alert("Not SSLVPN version.");
-                window.location.href = "../../pages/network.html";
+                window.location.href = "../../pages/network/ipsec_setting.html";
             } else {
                 var remote_tf = document.getElementById("remote");
 		    	var port_tf = document.getElementById("port");

@@ -26,53 +26,57 @@ function initIPSEC() {
         url:url,
         dataType:"json",
         success : function(json) {
+            if (json.enable == "true")
+            {
+                var right = document.getElementById("right");
+                var left = document.getElementById("left");
+                var keyexchange = document.getElementById("keyexchange");
+                var ike = document.getElementById("ike");
+                var ikelifetime = document.getElementById("ikelifetime");
+                var margintime = document.getElementById("margintime");
+                var auto = document.getElementById("auto");
+                var keyingtries = document.getElementById("keyingtries");
+                var aggressive = document.getElementById("aggressive");
+                var authby = document.getElementById("authby");
+                var rightid = document.getElementById("rightid");
+                var forceencaps  = document.getElementById("forceencaps");
+                var type  = document.getElementById("type");
+                var lifetime = document.getElementById("lifetime");
+                var replay_window = document.getElementById("replay_window");
+                var esp = document.getElementById("esp");
+                var leftsubnet = document.getElementById("leftsubnet");
+                var rightsubnet = document.getElementById("rightsubnet");
+                var dpdaction  = document.getElementById("dpdaction");
+                var dpddelay  = document.getElementById("dpddelay");
+                var dpdtimeout = document.getElementById("dpdtimeout");
+                var closeaction = document.getElementById("closeaction");
 
-            var right = document.getElementById("right");
-			var left = document.getElementById("left");
-			var keyexchange = document.getElementById("keyexchange");
-			var ike = document.getElementById("ike");
-			var ikelifetime = document.getElementById("ikelifetime");
-			var margintime = document.getElementById("margintime");
-			var auto = document.getElementById("auto");
-			var keyingtries = document.getElementById("keyingtries");
-			var aggressive = document.getElementById("aggressive");
-			var authby = document.getElementById("authby");
-			var rightid = document.getElementById("rightid");
-			var forceencaps  = document.getElementById("forceencaps");
-			var type  = document.getElementById("type");
-			var lifetime = document.getElementById("lifetime");
-			var replay_window = document.getElementById("replay_window");
-			var esp = document.getElementById("esp");
-			var leftsubnet = document.getElementById("leftsubnet");
-			var rightsubnet = document.getElementById("rightsubnet");
-			var dpdaction  = document.getElementById("dpdaction");
-			var dpddelay  = document.getElementById("dpddelay");
-			var dpdtimeout = document.getElementById("dpdtimeout");
-			var closeaction = document.getElementById("closeaction");
-
-			right.value = json.config.right;
-			left.value = json.config.left;
-			keyexchange.value = json.config.keyexchange;
-			ike.value = json.config.ike;
-			ikelifetime.value = json.config.ikelifetime;
-			margintime.value = json.config.margintime;
-			auto.value = json.config.auto;
-			keyingtries.value = json.config.keyingtries;
-			aggressive.value = json.config.aggressive;
-			authby.value = json.config.authby;
-			rightid.value = json.config.rightid;
-			forceencaps.value = json.config.forceencaps;
-			type.value = json.config.type;
-			lifetime.value = json.config.lifetime;
-			replay_window.value = json.config.replay_window;
-			esp.value = json.config.esp;
-			leftsubnet.value = json.config.leftsubnet;
-			rightsubnet.value = json.config.rightsubnet;
-			dpdaction.value = json.config.dpdaction;
-			dpddelay.value = json.config.dpddelay;
-			dpdtimeout.value = json.config.dpdtimeout;
-			closeaction.value = json.config.closeaction;
-
+                right.value = json.config.right;
+                left.value = json.config.left;
+                keyexchange.value = json.config.keyexchange;
+                ike.value = json.config.ike;
+                ikelifetime.value = json.config.ikelifetime;
+                margintime.value = json.config.margintime;
+                auto.value = json.config.auto;
+                keyingtries.value = json.config.keyingtries;
+                aggressive.value = json.config.aggressive;
+                authby.value = json.config.authby;
+                rightid.value = json.config.rightid;
+                forceencaps.value = json.config.forceencaps;
+                type.value = json.config.type;
+                lifetime.value = json.config.lifetime;
+                replay_window.value = json.config.replay_window;
+                esp.value = json.config.esp;
+                leftsubnet.value = json.config.leftsubnet;
+                rightsubnet.value = json.config.rightsubnet;
+                dpdaction.value = json.config.dpdaction;
+                dpddelay.value = json.config.dpddelay;
+                dpdtimeout.value = json.config.dpdtimeout;
+                closeaction.value = json.config.closeaction;
+            } else {
+                alert("Not IPSec version.");                             
+                window.location.href = "../../pages/network/sslvpn_setting.html";
+            }
         },
         error : function(xhr, status, error) {
 			console.log("에러발생");
