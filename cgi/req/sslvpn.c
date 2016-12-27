@@ -13,7 +13,7 @@
 int FTMC_SSLVPN(qentry_t *pReq)
 {
 	int		nRet = 0;
-	char	pCmdBuff[1024];
+	//char	pCmdBuff[1024];
 	char *pCmd = pReq->getstr(pReq, "cmd", false);
 	
 	qcgires_setcontenttype(pReq, "application/json");
@@ -119,8 +119,9 @@ int FTMC_SSLVPN(qentry_t *pReq)
 			fprintf(pFP, "%s", pPassword);
 			fclose(pFP);
 
-			sprintf(pCmdBuff, "/bin/cp -f %s %s;/bin/cp -f %s %s;sync;sync;/mnt/ramdisk/do/sslvpn_client/xenics restart", TEMP_SSLVPN_CONF, SSLVPN_CONF, TEMP_SSLVPN_USR, SSLVPN_USR);
-			pFP = popen(pCmdBuff, "r");
+			//sprintf(pCmdBuff, "/bin/cp -f %s %s;/bin/cp -f %s %s;sync;sync;/mnt/ramdisk/do/sslvpn_client/xenics restart &", TEMP_SSLVPN_CONF, SSLVPN_CONF, TEMP_SSLVPN_USR, SSLVPN_USR);
+			//pFP = popen(pCmdBuff, "r");
+            pFP = popen("/mnt/ramdisk/img/etc/www/cgi-bin/scripts/make_sslvpn_conf.sh", "r");
 
 			printf("{");
 
