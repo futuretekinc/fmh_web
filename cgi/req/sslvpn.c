@@ -119,7 +119,7 @@ int FTMC_SSLVPN(qentry_t *pReq)
 			fprintf(pFP, "%s", pPassword);
 			fclose(pFP);
 
-			sprintf(pCmdBuff, "/bin/cp -f %s %s;/bin/cp -f %s %s;sync;sync;/mnt/ramdisk/do/ssslvpn_client/xenics restart", TEMP_SSLVPN_CONF, SSLVPN_CONF, TEMP_SSLVPN_USR, SSLVPN_USR);
+			sprintf(pCmdBuff, "/bin/cp -f %s %s;/bin/cp -f %s %s;sync;sync;/mnt/ramdisk/do/sslvpn_client/xenics restart", TEMP_SSLVPN_CONF, SSLVPN_CONF, TEMP_SSLVPN_USR, SSLVPN_USR);
 			pFP = popen(pCmdBuff, "r");
 
 			printf("{");
